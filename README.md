@@ -18,7 +18,7 @@ Welcome to PhonePe Pulse, where data meets innovation! Our interactive web appli
 
 Embark on a thrilling journey through my workflow.
 
-### Step 1: Empowerment Through Libraries
+### Step 1: Importing the Libraries
 
 Equip yourself with the arsenal of libraries essential for your journey. Install and import with ease to unlock a world of possibilities.
 
@@ -35,10 +35,10 @@ If the libraries are already installed then we have to import those into our scr
   
  
 
-### Step 2: Unearth Data Treasures
+### Step 2: Data Extraction
 Embark on a quest to unearth data treasures! Clone the GitHub repository to uncover the rich tapestry of insights hidden within PhonePe Pulse.
 
-### Step 3: Shape Your Narrative
+### Step 3: Data Transformation
 Craft your story with precision and finesse. Transform raw JSON files into elegant DataFrames, shaping your data into a compelling narrative.
     
     path1 = "Path of the JSON files"
@@ -77,7 +77,7 @@ Looping through each and every folder and opening the json files appending only 
         aggregated_transaction = pd.DataFrame(column1)
     
 
-### Step 4: Forge Connections
+### Step 4: Database Connection
 Forge powerful connections between your data and the digital realm. Establish a bridge to the MySQL database, allowing your insights to permeate through the fabric of the digital landscape.
 
    **Creating the connection between python and mysql**
@@ -101,11 +101,9 @@ Forge powerful connections between your data and the digital realm. Establish a 
       mydb.commit()
 
 ### Step 5: Dashboard Creation
-
 To create a colorful and insightful dashboard, I've used Plotly libraries in Python to create an interactive and visually appealing dashboard. Plotly's built-in Pie, Bar, Geo map functions are used to display the data on charts and maps, while Streamlit is used to create a user-friendly interface with multiple dropdown options for users to select different facts and figures to display.
 
 ### Step 6: Data Retrieval
-
 Finally, if needed, use the "mysql-connector-python" library to connect to the MySQL database and fetch the data into a Pandas dataframe.
 
 
