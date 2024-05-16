@@ -11,14 +11,25 @@ from streamlit_option_menu import option_menu
 
 # Setting up page configuration
 icon = Image.open(r"C:\Users\tpsna\OneDrive\Desktop\VSCode\Phonepe\phonepe.png")
-st.set_page_config(page_title="Phonepe Pulse Data Visualization | By Dhusha",
+st.set_page_config(page_title="Phonepe Pulse Data Visualization",
                     page_icon=icon,
                     layout="wide",
                     initial_sidebar_state="expanded",
-                   menu_items={'About': """# This dashboard app is created by *Dhusha*!
-                                        Data has been cloned from Phonepe Pulse Github Repo"""})
+                    menu_items = {
+                    'About': """# About This Dashboard
+                    
+                                Welcome to our interactive dashboard!
+                                
+                                This dashboard provides insights into various data metrics cloned from the Phonepe Pulse Github Repository.
+                                
+                                You can explore different sections to visualize and analyze the data.
+                                
+                                Dive in and discover interesting patterns and trends!
+                                
+                                **Data Source:** Phonepe Pulse Github Repository
+                                """})
 
-st.sidebar.markdown("**:violet[Hello! Welcome to the dashboard]** :wave:")
+st.sidebar.markdown("**:violet[Hello! Explore the data and gain insights at your fingertips]** :wave:")
 
 mydb = mysql.connector.connect(host="localhost", user="root", password="Dhusha98")
 mycursor = mydb.cursor(buffered=True)
@@ -27,7 +38,7 @@ mycursor = mydb.cursor(buffered=True)
 
 # Creating option menu in the side bar
 with st.sidebar:
-    selected = option_menu("Menu", ["Home", "Top Charts", "Explore Data", "About"],
+    selected = option_menu("Menu", ["Home", "Featured Trends", "Discover Insights", "About"],
                             icons=["house", "graph-up-arrow", "bar-chart-line", "exclamation-circle"],
                             menu_icon="menu-button-wide",
                             default_index=0,
@@ -38,20 +49,19 @@ with st.sidebar:
 # MENU 1 - HOME
 if selected == "Home":
     st.markdown("# :violet[Phonpe Pulse Data Visualization and Exploration]")
-    st.markdown("## :white[A User-Friendly Tool Using Streamlit and Plotly] 🚀")
+    st.markdown("## :white[A User-Friendly Tool Using Streamlit and Plotly 🚀]")
 
-    col1, col2 = st.columns([4, 1], gap="medium")
+    col1 = st.columns([4])[0] 
+
     with col1:
         st.write(" ")
         st.write(" ")
         st.markdown("### :violet[Domain :] Fintech")
         st.markdown("### :violet[Technologies used :] Github-Cloning, Python, Pandas, MySQL, mysql-connector-python, Streamlit and Plotly")
-        st.markdown("### :violet[Overview :]  This streamlit app can be used to visualize the PhonePe pulse data and gain lots of insights on Transactions, Number of users, Top 10 States, Districts, Pincodes. Bar charts, Pie charts and Geo map visualization are used to get insights.")
-    with col2:
-        st.image(r"C:\Users\tpsna\OneDrive\Desktop\VSCode\Phonepe\phonepe_image.webp")
+        st.markdown("### :violet[Overview :]  This Streamlit app can be used to visualize the PhonePe pulse data and gain insights on transactions, number of users, top 10 states, districts, and pincodes. Bar charts, pie charts, and geo map visualization are used to provide insights.")
 
-if selected == "Top Charts":
-    st.markdown("## :violet[Top Charts]")
+if selected == "Featured Trends":
+    st.markdown("## :violet[Featured Trends]")
     Type = st.sidebar.selectbox("**Type**", ("Transactions", "Users"))
     col1, col2 = st.columns([1, 1.5], gap="large")
     with col1:
@@ -60,25 +70,28 @@ if selected == "Top Charts":
 
     with col2:
         st.info(
-            """
-            ### Insights Menu :mag_right:
-            Explore key insights including:
-            
-            - Overall ranking for a specific Year and Quarter.
-            - Top 10 States, Districts, Pincodes by total transaction volume and spending.
-            - Top 10 States, Districts, Pincodes by total PhonePe users and app usage frequency.
-            - Top 10 Mobile Brands and their market share among PhonePe users.
-            """
-        )
+                """
+                ### Insights you will gain here:mag_right:
+                
+                Explore key insights including:
+                
+                - Overall ranking for a specific Year and Quarter.
+                - Top 10 States, Districts, Pincodes by total transaction volume and spending.
+                - Top 10 States, Districts, Pincodes by total PhonePe users and app usage frequency.
+                - Top 10 Mobile Brands and their market share among PhonePe users.
+                """
+            )
 
-    # Top Charts - TRANSACTIONS
+
+    # Featured Trends - TRANSACTIONS
     if Type == "Transactions":
         col1, col2, col3 = st.columns([1, 1, 1], gap="small")
 
         with col1:
             st.markdown("### :violet[States]")
-            mycursor.execute(f"""
-                SELECT States, SUM(Transaction_count) AS Total_Transactions, SUM(Transaction_amount) AS Total_Amount
+            mycursor.execute(f"""SELECT States, 
+                                SUM(Transaction_count) AS Total_Transactions, 
+                                SUM(Transaction_amount) AS Total_Amount
                 FROM agr_trns
                 WHERE Years = {Years} AND Quater = {Quater}
                 GROUP BY States
@@ -101,8 +114,9 @@ if selected == "Top Charts":
 
         with col2:
             st.markdown("### :violet[Districts]")
-            mycursor.execute(f"""
-                SELECT Districts, SUM(Transaction_count) AS Total_Transactions, SUM(Transaction_amount) AS Total_Amount
+            mycursor.execute(f"""SELECT Districts, 
+                                SUM(Transaction_count) AS Total_Transactions, 
+                                SUM(Transaction_amount) AS Total_Amount
                 FROM map_trns
                 WHERE Years = {Years} AND Quater = {Quater}
                 GROUP BY Districts
@@ -112,26 +126,24 @@ if selected == "Top Charts":
             data2 = mycursor.fetchall()
             if data2:
                 df2 = pd.DataFrame(data2, columns=['Districts', 'Total_Transactions', 'Total_Amount'])
-                
-                # Create bar chart using Plotly
-                fig = px.bar(df2, x='Districts', y='Total_Amount', 
+                fig = px.pie(df2, names='Districts', 
+                            values='Total_Amount', 
                             color='Total_Transactions',
+                            color_discrete_sequence=px.colors.sequential.Agsunset,
                             title='Top 10 Districts by Total Transactions',
-                            labels={'Districts': 'District', 'Total_Amount': 'Total Amount', 'Total_Transactions': 'Total Transactions'},
-                            color_continuous_scale=px.colors.sequential.Agsunset)
+                            hover_data=['Total_Transactions'],
+                            labels={'Total_Amount': 'Total Amount', 'Total_Transactions': 'Total Transactions'})
                 
-                # Update layout
-                fig.update_layout(xaxis_title='Districts', yaxis_title='Total Amount')
-                
-                # Display the bar chart
+                fig.update_traces(textposition='inside', textinfo='percent+label')
                 st.plotly_chart(fig, use_container_width=True)
             else:
                 st.warning("No data available for selected period.")
 
         with col3:
             st.markdown("### :violet[Pincodes]")
-            mycursor.execute(f"""
-                SELECT Pincodes, SUM(Transaction_count) AS Total_Transactions, SUM(Transaction_amount) AS Total_Amount
+            mycursor.execute(f"""SELECT Pincodes, 
+                                SUM(Transaction_count) AS Total_Transactions, 
+                                SUM(Transaction_amount) AS Total_Amount
                 FROM top_trns
                 WHERE Years = {Years} AND Quater = {Quater}
                 GROUP BY Pincodes
@@ -152,26 +164,27 @@ if selected == "Top Charts":
             else:
                 st.warning("No data available for selected period.")
 
-    # Top Charts - USERS
+    # Featured Trends - USERS
     elif Type == "Users":
         col1, col2, col3, col4 = st.columns([2, 2, 2, 2], gap="small")
 
         with col1:
             st.markdown("### :violet[Brands]")
-            mycursor.execute(f"""
-                SELECT Brands, SUM(Transaction_count) AS Total_Users, AVG(Percentage)*100 AS Avg_Percentage
+            mycursor.execute(f"""SELECT Brands, 
+                                SUM(Transaction_count) AS Total_Transactions, 
+                                AVG(Percentage)*100 AS Avg_Percentage
                 FROM agr_user
                 WHERE Years = {Years} AND Quater = {Quater}
                 GROUP BY Brands
-                ORDER BY Total_Users DESC
+                ORDER BY Total_Transactions DESC
                 LIMIT 10
             """)
             data = mycursor.fetchall()
             if data:
-                df1 = pd.DataFrame(data, columns=['Brands', 'Total_Users', 'Avg_Percentage'])
+                df1 = pd.DataFrame(data, columns=['Brands', 'Total_Transactions', 'Avg_Percentage'])
                 fig = px.bar(df1,
-                                title='Top 10 Brands by Total Users',
-                                x="Total_Users",
+                                title='Top 10 Brands by Total_Transactions',
+                                x="Total_Transactions",
                                 y="Brands",
                                 orientation='h',
                                 color='Avg_Percentage',
@@ -181,41 +194,72 @@ if selected == "Top Charts":
                 st.warning("No data available for selected period.")
 
         with col2:
-            st.markdown("### :violet[Top Users]")
-            mycursor.execute("""
-                SELECT States, Pincodes, RegisteredUsers, Total_Amount
-                FROM top_user
-                LIMIT 10
-            """)
-            top_user_data = mycursor.fetchall()
-            if top_user_data:
-                df2 = pd.DataFrame(top_user_data, columns=['States', 'Pincodes', 'RegisteredUsers', 'Total_Amount'])
-                
-                # Create bar chart using Plotly
-                fig = px.bar(df2, 
-                                title='Top 10 Users by State',
-                                x='States', 
-                                y='RegisteredUsers', 
-                                color='Total_Amount',  # Use an existing column for coloring
-                                color_continuous_scale=px.colors.sequential.Agsunset,
-                                labels={'States': 'State', 'RegisteredUsers': 'Registered Users', 'Total_Amount': 'Total Amount'})
-                    
-                # Update layout
-                fig.update_layout(xaxis_title='State', yaxis_title='Registered Users')
-                    
-                # Display the bar chart
-                st.plotly_chart(fig, use_container_width=True)
+            st.markdown("### :violet[Districts]")
+            mycursor.execute(f"""SELECT Districts, 
+                                SUM(RegisteredUsers) as Total_Users, 
+                                SUM(AppOpens) as Total_Appopens 
+                            FROM map_user 
+                            WHERE Years = {Years} AND Quater = {Quater} 
+                            GROUP BY Districts 
+                            ORDER BY Total_Users 
+                            DESC LIMIT 10""")
+            df2 = pd.DataFrame(mycursor.fetchall(), columns=['Districts', 'Total_Users','Total_Appopens'])
+            df2['Total_Users'] = df2['Total_Users'].astype(float)
+            fig = px.bar(df2,
+                        title='Top 10',
+                        x="Total_Users",
+                        y="Districts", 
+                        orientation='h',
+                        color='Total_Users',
+                        color_continuous_scale=px.colors.sequential.Agsunset)
+            st.plotly_chart(fig, use_container_width=True)
 
+        with col3:
+            st.markdown("### :violet[Pincode]")
+            mycursor.execute(f"""SELECT Pincodes, 
+                                SUM(RegisteredUsers) as Total_Users 
+                            FROM top_user 
+                            WHERE Years = {Years} AND Quater = {Quater} 
+                            GROUP BY Pincodes 
+                            ORDER BY Total_Users 
+                            DESC LIMIT 10""")
+            df = pd.DataFrame(mycursor.fetchall(), columns=['Pincodes', 'Total_Users'])
+            fig = px.pie(df,
+                        values='Total_Users',  
+                        names='Pincodes',  
+                        title='Top 10 Pin Codes by Total Users',
+                        color_discrete_sequence=px.colors.sequential.Agsunset,
+                        hover_data=['Total_Users'])
+            fig.update_traces(textposition='inside', textinfo='percent+label')
+            st.plotly_chart(fig, use_container_width=True)
 
+        with col4:
+            st.markdown("### :violet[State]")
+            mycursor.execute(f"""SELECT States, 
+                                SUM(RegisteredUsers) as Total_Users, 
+                                SUM(AppOpens) as Total_Appopens 
+                            FROM map_user WHERE Years = {Years} AND Quater = {Quater} 
+                            GROUP BY States 
+                            ORDER BY Total_Users 
+                            DESC LIMIT 10""")
+            df4 = pd.DataFrame(mycursor.fetchall(), columns=['States', 'Total_Users','Total_Appopens'])
+            fig = px.pie(df4, values='Total_Users',
+                            names='States',  
+                            title='Top 10',
+                            color_discrete_sequence=px.colors.sequential.Agsunset,
+                            hover_data=['Total_Appopens'],
+                            labels={'Total_Appopens':'Total_Appopens'})
+            fig.update_traces(textposition='inside', textinfo='percent+label')
+            st.plotly_chart(fig, use_container_width=True)
 
-# EXPLORE DATA - Transactions      
-elif selected == "Explore Data":
+# Discover Insights - Transactions      
+elif selected == "Discover Insights":
     Years = st.sidebar.slider("**Years**", min_value=2018, max_value=2023)
     Quater = st.sidebar.slider("Quater", min_value=1, max_value=4)
     Type = st.sidebar.selectbox("**Type**", ("Transactions", "Users"))
     col1, col2 = st.columns(2)
 
-    # Explore DATA - Transactions:
+    # Discover Insights - Transactions:
     if Type == "Transactions":
         with col1:
             st.markdown("## :violet[Overall State Data - Transactions Amount]")
@@ -223,18 +267,18 @@ elif selected == "Explore Data":
                 SELECT States,
                         SUM(Transaction_count) as Total_Transactions,
                         SUM(Transaction_amount) AS Total_Amount
-                    FROM map_trns
+                FROM map_trns
                 WHERE Years = {Years} AND Quater = {Quater}
                 GROUP BY States
                 ORDER BY States
             """)
             df1 = pd.DataFrame(mycursor.fetchall(), columns=['States', 'Total_Transactions', 'Total_Amount'])
-            df2 = pd.read_csv(r"C:\Users\tpsna\OneDrive\Desktop\VSCode\Phonepe\States.csv")  # Assuming this CSV contains state names
+            df2 = pd.read_csv(r"C:\Users\tpsna\OneDrive\Desktop\VSCode\Phonepe\States.csv")  
             df1.State = df2
             fig = px.choropleth(df1, geojson="https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson",
                                 featureidkey='properties.ST_NM',
                                 locations='States',
-                                color='Total_Amount',  # Change this to 'Total_Users' or 'Total_Appopens'
+                                color='Total_Amount',  
                                 color_continuous_scale='sunset')
 
             fig.update_geos(fitbounds="locations", visible=False)
@@ -259,16 +303,14 @@ elif selected == "Explore Data":
             fig = px.choropleth(df1, geojson="https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson",
                                 featureidkey='properties.ST_NM',
                                 locations='States',
-                                color='Total_Transactions',  # Change this to 'Total_Transactions' or 'Total_Amount'
+                                color='Total_Transactions',  
                                 color_continuous_scale='sunset')
-
             fig.update_geos(fitbounds="locations", visible=False)
             st.plotly_chart(fig, use_container_width=True)
 
         # BAR CHART - TOP PAYMENT TYPE
         st.markdown("## :violet[Top Payment Type]")
-        mycursor.execute(f"""
-            SELECT Transaction_type, 
+        mycursor.execute(f"""SELECT Transaction_type, 
                     SUM(Transaction_count) AS Total_Transactions, 
                     SUM(Transaction_amount) AS Total_Amount 
             FROM agr_trns 
@@ -298,8 +340,7 @@ elif selected == "Explore Data":
                                         'Nagaland', 'Odisha', 'Puducherry', 'Punjab', 'Rajasthan',
                                         'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura', 'Uttar Pradesh',
                                         'Uttarakhand', 'West Bengal'), index=30)
-        mycursor.execute(f"""
-            SELECT States, Districts, Years, Quater,
+        mycursor.execute(f"""SELECT States, Districts, Years, Quater,
                     SUM(Transaction_count) AS Total_Transactions,
                     SUM(Transaction_amount) AS Total_Amount
             FROM map_trns
@@ -315,14 +356,13 @@ elif selected == "Explore Data":
                         x="Districts",
                         y="Total_Transactions",
                         orientation='v',
-                        color='Total_Amount',  # Change this to 'Total_Users' or 'Total_Appopens'
+                        color='Total_Amount',  
                         color_continuous_scale=px.colors.sequential.Agsunset)
         st.plotly_chart(fig, use_container_width=True)
 
-# EXPLORE DATA - USERS      
+# Discover Insights - USERS      
     elif Type == "Users":
         st.markdown("## :violet[Overall State Data - User App opening frequency]")
-
         mycursor.execute(f"""
                             SELECT States,
                                     SUM(RegisteredUsers) AS Total_Users,
@@ -338,15 +378,14 @@ elif selected == "Explore Data":
         df1.States = df2
         fig = px.choropleth(df1, geojson="https://gist.githubusercontent.com/jbrobst/56c13bbbf9d97d187fea01ca62ea5112/raw/e388c4cae20aa53cb5090210a42ebb9b765c0a36/india_states.geojson",
                             featureidkey='properties.ST_NM',
-                            locations='States',  # Correcting the column name to match DataFrame
+                            locations='States',  
                             color='Total_Appopens',
                             color_continuous_scale='sunset')
         fig.update_geos(fitbounds="locations", visible=False)
         st.plotly_chart(fig, use_container_width=True)
 
         st.markdown("## :violet[Select any State to explore more]")
-        mycursor.execute(f"""
-            SELECT States, 
+        mycursor.execute(f"""SELECT States, 
                 SUM(RegisteredUsers) AS Total_Users, 
                 SUM(AppOpens) AS Total_Appopens 
             FROM map_user 
@@ -355,24 +394,14 @@ elif selected == "Explore Data":
             ORDER BY Total_Users DESC, Total_Appopens DESC
             LIMIT 10""")
         result = mycursor.fetchall()
-
-        # Convert SQL result to DataFrame
         df = pd.DataFrame(result, columns=['States', 'Total_Users', 'Total_Appopens'])
-
-        # Melt DataFrame to long format for plotting
         df_melted = pd.melt(df, id_vars=['States'], value_vars=['Total_Users', 'Total_Appopens'],
                             var_name='Metric', value_name='Count')
-
-        # Create grouped horizontal bar chart using Plotly
         fig = px.bar(df_melted, y='States', x='Count', color='Metric', orientation='h',
                     barmode='group', title=f'Total Users and Total AppOpens by State for Year {Years} Quarter {Quater}',
                     labels={'States': 'State', 'Count': 'Count', 'Metric': 'Metric'},
                     color_discrete_map={'Total_Users': 'orange', 'Total_Appopens': 'blue'})
-
-        # Update layout
         fig.update_layout(yaxis_tickangle=-45)
-
-        # Display Plotly chart in Streamlit
         st.plotly_chart(fig)
 
 # MENU 4 - ABOUT
@@ -382,7 +411,7 @@ if selected == "About":
         st.write(" ")
         st.write(" ")
         st.markdown("### :violet[About PhonePe Pulse:] ")
-        st.write("##### BENGALURU, India, On Sept. 3, 2021 PhonePe, India's leading fintech platform, announced the launch of PhonePe Pulse, India's first interactive website with data, insights and trends on digital payments in the country. The PhonePe Pulse website showcases more than 2000+ Crore transactions by consumers on an interactive map of India. With  over 45% market share, PhonePe's data is representative of the country's digital payment habits.")
+        st.write("##### BENGALURU, India, Sept. 3, 2021: PhonePe, India's leading fintech platform, launched PhonePe Pulse, India's first interactive website with data, insights, and trends on digital payments. The website showcases 2000+ Crore transactions on an interactive map of India, reflecting the country's digital payment habits with over 45% market share.")
         
         st.write("##### The insights on the website and in the report have been drawn from two key sources - the entirety of PhonePe's transaction data combined with merchant and customer interviews. The report is available as a free download on the PhonePe Pulse website and GitHub.")
         
@@ -391,7 +420,10 @@ if selected == "About":
         
         st.write("**:violet[My Project GitHub link]** ⬇️")
         st.markdown("[GitHub Profile](https://github.com/Dhusha)")
-      
+
+        st.write("**Thank you, Hope you gained some insights from this**")
+
+
     with col2:
         st.write(" ")
         st.write(" ")
